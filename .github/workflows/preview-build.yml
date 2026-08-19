@@ -1,0 +1,24 @@
+# Preview build — every branch except main.
+#
+# Each branch is its own environment on the platform, and an environment can only
+# deploy a commit that has a verified image. So every branch push must build, or the
+# preview sits in ImageResolved=NoVerifiedBuild forever.
+#
+# Images are commit-keyed with NO branch slug: the same commit on two branches IS
+# the same image, which is what makes a merge deploy instantly.
+#
+# See .github/workflows/build.yml for the full model.
+name: Preview build
+
+on:
+  push:
+    branches-ignore: [main]
+
+concurrency:
+  group: preview-build-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: ho-nl/deployyy/.github/workflows/magento2-build.yml@main
+    secrets: inherit

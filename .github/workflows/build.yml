@@ -1,0 +1,30 @@
+# Main-branch build. Thin caller of the platform's central Magento build.
+#
+# Everything is DERIVED, never declared here:
+#   - the release line comes from composer.json (mage-os/product-community-edition
+#     ^3.4 -> the `mageos-3` recipe),
+#   - the Dockerfile and .platform/* support files come from that recipe in the
+#     public ho-nl/deployyy repo (so PHP version, nginx config, env.php and the
+#     build-correctness rules stay centrally maintained — do NOT copy them here),
+#   - the static-content locales come from the repository Actions variable
+#     DEPLOYYY_MAGENTO_LOCALES, which the deployyy operator converges from the
+#     Magento2App's `magento.buildLocales`. Do not edit that variable by hand.
+#
+# Output: ghcr.io/<owner>/<repo>:php-fpm-<sha7> and :nginx-<sha7> — the exact
+# commit-keyed tags the operator verifies before it deploys. This repo's CI holds
+# ZERO cluster credentials; it only builds and pushes.
+name: Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: build-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    uses: ho-nl/deployyy/.github/workflows/magento2-build.yml@main
+    secrets: inherit

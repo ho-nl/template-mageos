@@ -1,0 +1,68 @@
+# NOTE: this deliberately DIFFERS from Magento's stock .gitignore in one place —
+# `app/etc/config.php` is NOT ignored here. On this platform the committed
+# config.php is the module contract: a Mage-OS version bump brings vendor modules
+# with it, and a module that is not listed there is neither deliberately enabled nor
+# deliberately disabled. Two production incidents came out of exactly that gap.
+# After any dependency change, regenerate and commit it:
+#
+#   composer install --no-dev && php bin/magento module:enable --all
+#
+# `composer.lock` is likewise committed (reproducible builds) — see README.
+
+/app/etc/env.php
+/app/etc/*.xml
+!/app/etc/di.xml
+!/app/etc/db_schema.xml
+/app/code/Magento/
+/app/design/frontend/Magento/
+/app/design/adminhtml/Magento/
+/app/etc/cache_types.php
+/lib/internal/flex/uploader/.actionScriptProperties
+/lib/internal/flex/uploader/.flexLibProperties
+/lib/internal/flex/uploader/.project
+/lib/internal/flex/uploader/.settings
+/lib/internal/flex/varien/.actionScriptProperties
+/lib/internal/flex/varien/.flexLibProperties
+/lib/internal/flex/varien/.project
+/lib/internal/flex/varien/.settings
+/node_modules/
+/package-lock.json
+/dev/tools/grunt/-
+/dev/tests/functional/etc/config.xml
+/dev/tests/js/jasmine/spec/
+/generated/*
+!/generated/.htaccess
+/pub/media/*.*
+!/pub/media/.htaccess
+/pub/media/attribute/*
+!/pub/media/attribute/.htaccess
+/pub/media/analytics/*
+/pub/media/catalog/*
+!/pub/media/catalog/.htaccess
+/pub/media/customer/*
+!/pub/media/customer/.htaccess
+/pub/media/downloadable/*
+!/pub/media/downloadable/.htaccess
+/pub/media/import/*
+!/pub/media/import/.htaccess
+/pub/media/theme/*
+/pub/media/theme_customization/*
+!/pub/media/theme_customization/.htaccess
+/pub/media/wysiwyg/*
+!/pub/media/wysiwyg/.htaccess
+/pub/media/tmp/*
+!/pub/media/tmp/.htaccess
+/pub/media/captcha/*
+/pub/static/*
+!/pub/static/.htaccess
+/var/*
+!/var/.htaccess
+/vendor/*
+!/vendor/.htaccess
+
+# Local tooling
+/auth.json
+/.idea
+/.vscode
+/docker-compose.yml
+.DS_Store
