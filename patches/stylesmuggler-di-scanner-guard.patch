@@ -1,0 +1,68 @@
+StyleSmuggler mitigation (Sansec 2026-09-05): Magento's DI code scanners are
+CLI-only. Unauthenticated RCE in every Magento / Adobe Commerce / Mage-OS release
+up to 2.4.9 — attacker-controlled text reaches the email template filter, whose
+{{block}} directive drives a method chain into the DI compiler's scanners, whose
+include/require then executes a poisoned var/report or var/log file. These
+scanners only ever run from bin/magento setup:di:compile, so reaching them over
+HTTP is the attack and nothing else — the guard throws on any non-CLI SAPI.
+Vendor patch pending (Adobe bulletin 2026-09-08); remove once it is in.
+
+Source: https://github.com/disrex-group/stylesmuggler-mitigation
+        patches/magento/magento2-base/stylesmuggler-di-scanner-guard.patch
+Advisory: https://sansec.io/research/stylesmuggler
+
+@package mage-os/magento2-base
+@category security
+@link https://sansec.io/research/stylesmuggler
+
+--- a/setup/src/Magento/Setup/Module/Di/Code/Scanner/ArrayScanner.php
++++ b/setup/src/Magento/Setup/Module/Di/Code/Scanner/ArrayScanner.php
+@@ -15,6 +15,14 @@
+      */
+     public function collectEntities(array $files)
+     {
++        // StyleSmuggler mitigation (unpatched 0-day, Sansec 2026-09-05): this
++        // DI scanner only runs from bin/magento setup:di:compile. Reaching it
++        // over HTTP means its include/require is being driven as an RCE sink.
++        // Remove once Adobe ships an official fix.
++        if (PHP_SAPI !== 'cli') {
++            throw new \RuntimeException('Magento DI code scanners are CLI-only.');
++        }
++
+         $output = [];
+         foreach ($files as $file) {
+             if (file_exists($file)) {
+--- a/setup/src/Magento/Setup/Module/Di/Code/Reader/ClassesScanner.php
++++ b/setup/src/Magento/Setup/Module/Di/Code/Reader/ClassesScanner.php
+@@ -131,6 +131,14 @@
+      */
+     private function includeClass(string $className, string $fileItemPath): bool
+     {
++        // StyleSmuggler mitigation (unpatched 0-day, Sansec 2026-09-05): this
++        // DI scanner only runs from bin/magento setup:di:compile. Reaching it
++        // over HTTP means its include/require is being driven as an RCE sink.
++        // Remove once Adobe ships an official fix.
++        if (PHP_SAPI !== 'cli') {
++            throw new \RuntimeException('Magento DI code scanners are CLI-only.');
++        }
++
+         if (!class_exists($className)) {
+             // phpcs:ignore
+             require_once $fileItemPath;
+--- a/setup/src/Magento/Setup/Module/Di/Code/Scanner/XmlInterceptorScanner.php
++++ b/setup/src/Magento/Setup/Module/Di/Code/Scanner/XmlInterceptorScanner.php
+@@ -94,6 +94,14 @@
+      */
+     protected function _handleControllerClassName($className)
+     {
++        // StyleSmuggler mitigation (unpatched 0-day, Sansec 2026-09-05): this
++        // DI scanner only runs from bin/magento setup:di:compile. Reaching it
++        // over HTTP means its include/require is being driven as an RCE sink.
++        // Remove once Adobe ships an official fix.
++        if (PHP_SAPI !== 'cli') {
++            throw new \RuntimeException('Magento DI code scanners are CLI-only.');
++        }
++
+         if (!class_exists($className)) {
+             $className = preg_replace('/[^a-zA-Z0-9_]/', '', $className);
+             $className = preg_replace('/^([0-9A-Za-z]*)_([0-9A-Za-z]*)/', '\\1_\\2_controllers', $className);
