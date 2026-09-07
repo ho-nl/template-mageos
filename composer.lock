@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f712818674ea33899f061d2cdfe071b",
+    "content-hash": "b797e7e0e27df9554cdc08ff81f32a36",
     "packages": [
         {
             "name": "2tvenom/cborencode",
@@ -5301,6 +5301,63 @@
                 }
             ],
             "time": "2026-07-09T11:49:27+00:00"
+        },
+        {
+            "name": "loophp/phposinfo",
+            "version": "1.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/loophp/phposinfo.git",
+                "reference": "9faccbfbf5364fd34fbc230961fa6fc51cc66b8f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/loophp/phposinfo/zipball/9faccbfbf5364fd34fbc230961fa6fc51cc66b8f",
+                "reference": "9faccbfbf5364fd34fbc230961fa6fc51cc66b8f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8"
+            },
+            "require-dev": {
+                "drupol/php-conventions": "^5.0.0",
+                "ext-pcov": "*",
+                "friends-of-phpspec/phpspec-code-coverage": "^6",
+                "infection/infection": "^0.26",
+                "infection/phpspec-adapter": "^0.2.0",
+                "phpspec/phpspec": "^7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "loophp\\phposinfo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pol Dellaiera",
+                    "email": "pol.dellaiera@protonmail.com"
+                }
+            ],
+            "description": "Try to guess the host operating system.",
+            "keywords": [
+                "operating system detection"
+            ],
+            "support": {
+                "issues": "https://github.com/loophp/phposinfo/issues",
+                "source": "https://github.com/loophp/phposinfo"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/drupol",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-12-20T20:21:10+00:00"
         },
         {
             "name": "mage-os/composer",
@@ -27143,6 +27200,178 @@
             "time": "2018-01-15T15:26:51+00:00"
         },
         {
+            "name": "vaimo/composer-patches",
+            "version": "6.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vaimo/composer-patches.git",
+                "reference": "ca8c3670a6d04f6c08ef23561ee4de71c86f2f87"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vaimo/composer-patches/zipball/ca8c3670a6d04f6c08ef23561ee4de71c86f2f87",
+                "reference": "ca8c3670a6d04f6c08ef23561ee4de71c86f2f87",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "composer-runtime-api": "^2.0",
+                "ext-json": "*",
+                "loophp/phposinfo": "^1.6 || ^1.7",
+                "php": ">=7.1.0",
+                "seld/jsonlint": "^1.7.1",
+                "symfony/console": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0",
+                "vaimo/topological-sort": "^1.0 || ^2.0"
+            },
+            "conflict": {
+                "cweagans/composer-patches": "*"
+            },
+            "require-dev": {
+                "composer/composer": "^2.0",
+                "phpcompatibility/php-compatibility": ">=9.1.1",
+                "phpmd/phpmd": ">=2.6.0",
+                "squizlabs/php_codesniffer": ">=2.9.2",
+                "vaimo/composer-changelogs": "^1.0 || ^2.0",
+                "vaimo/composer-patches-proxy": "1.0.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Vaimo\\ComposerPatches\\Plugin",
+                "changelog": {
+                    "output": {
+                        "md": "CHANGELOG.md"
+                    },
+                    "source": "changelog.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vaimo\\ComposerPatches\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Allan Paiste",
+                    "email": "allan.paiste@vaimo.com"
+                }
+            ],
+            "description": "Applies a patch from a local or remote file to any package that is part of a given composer project. Patches can be defined both on project and on package level. Optional support for patch versioning, sequencing, custom patch applier configuration and patch command for testing/troubleshooting added patches.",
+            "keywords": [
+                "Fixes",
+                "back-ports",
+                "backports",
+                "bulk patches",
+                "bundled patches",
+                "composer command",
+                "composer plugin",
+                "configurable patch applier",
+                "development patches",
+                "downloaded patches",
+                "environment flags",
+                "hot-fixes",
+                "hotfixes",
+                "indirect restrictions",
+                "maintenance",
+                "maintenance tools",
+                "multi-version patches",
+                "multiple formats",
+                "os-specific config",
+                "package bug-fix",
+                "package patches",
+                "patch branching",
+                "patch command",
+                "patch description",
+                "patch exclusion",
+                "patch header",
+                "patch meta-data",
+                "patch resolve",
+                "patch search",
+                "patch skipping",
+                "patcher",
+                "patching",
+                "plugin",
+                "remote patch files",
+                "resolve patches",
+                "skipped packages",
+                "tools",
+                "utilities",
+                "utility",
+                "utils",
+                "version restriction"
+            ],
+            "support": {
+                "docs": "https://github.com/vaimo/composer-patches",
+                "issues": "https://github.com/vaimo/composer-patches/issues",
+                "source": "https://github.com/vaimo/composer-patches"
+            },
+            "time": "2026-06-12T06:43:10+00:00"
+        },
+        {
+            "name": "vaimo/topological-sort",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vaimo/topological-sort.git",
+                "reference": "a07ba38333b15ae54002b0f6def2a9a4db1d9bcf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vaimo/topological-sort/zipball/a07ba38333b15ae54002b0f6def2a9a4db1d9bcf",
+                "reference": "a07ba38333b15ae54002b0f6def2a9a4db1d9bcf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "phpcompatibility/php-compatibility": "^9",
+                "phpunit/phpunit": "~6.0 || ~7.0 || ~8.0 || ~9.0",
+                "squizlabs/php_codesniffer": "^2.9.2 || ^3.13",
+                "symfony/console": "~3.0 || ~4.0 || ~5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vaimo\\TopSort\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marc J. Schmidt",
+                    "email": "marc@marcjschmidt.de"
+                }
+            ],
+            "description": "High-Performance TopSort/Dependency resolving algorithm (compatibility version to work with 7.0 - 7.2)",
+            "keywords": [
+                "dependency resolving",
+                "topological sort",
+                "topsort"
+            ],
+            "support": {
+                "source": "https://github.com/vaimo/topological-sort/tree/2.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/marcj",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-04-16T08:02:34+00:00"
+        },
+        {
             "name": "voku/portable-ascii",
             "version": "2.1.1",
             "source": {
@@ -29713,5 +29942,5 @@
     "platform-overrides": {
         "php": "8.4.0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

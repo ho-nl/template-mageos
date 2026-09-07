@@ -11,7 +11,8 @@
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "laminas/laminas-dependency-plugin": true,
             "mage-os/*": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "vaimo/composer-patches": true
         },
         "platform": {
             "php": "8.4.0"
@@ -48,7 +49,8 @@
         "mage-os/module-widget-sample-data": "^3.4",
         "mage-os/module-wishlist-sample-data": "^3.4",
         "mage-os/product-community-edition": "^3.4",
-        "mage-os/sample-data-media": "^3.4"
+        "mage-os/sample-data-media": "^3.4",
+        "vaimo/composer-patches": "^6.0"
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7 || ^1.0",
@@ -93,7 +95,10 @@
         }
     },
     "extra": {
-        "magento-force": "override"
+        "magento-force": "override",
+        "patches-search": {
+            "*": "patches"
+        }
     },
     "prefer-stable": true,
     "minimum-stability": "stable"
