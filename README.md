@@ -29,6 +29,7 @@ git push
        └─ ho-nl/deployyy .github/workflows/magento2-build.yml   (central, public)
             ├─ reads composer.json  -> release line `mageos-3`
             ├─ applies that line's Dockerfile + .platform/ recipe
+            │    (composer install — with patches/ applied — then the rest of the tree)
             └─ pushes ghcr.io/<owner>/<repo>:php-fpm-<sha7>
                                             :nginx-<sha7>
   └─ the deployyy operator sees the commit-keyed tags, and deploys them
@@ -78,6 +79,20 @@ nor deliberately disabled; two production incidents came out of exactly that gap
 It lists modules only — no `scopes` block, because the build injects scopes for the
 DB-less static-content deploy and strips them again, and `setup:install` owns scope
 creation in the database.
+
+**`patches/`** — vendor patches, applied by
+[`vaimo/composer-patches`](https://github.com/vaimo/composer-patches) during
+`composer install` (`extra.patches-search` points here). The recipe copies this
+directory into the build context *before* the install, so a patch committed here is
+in the image the platform deploys — that is how a vendor security fix ships before
+the upstream release does (first use: the StyleSmuggler DI-scanner guard,
+`patches/stylesmuggler-di-scanner-guard.patch`, Sansec 2026-09-05). Each patch
+declares its target package in its vaimo header (`@package mage-os/magento2-base`
+here — a `magento/*` target resolves to nothing on Mage-OS). Two failure modes to
+know: a patch the plugin cannot apply **fails the build**, but a patch the plugin
+never sees (wrong directory, wrong package name) is a **silent no-op** — build green,
+unpatched image. When it matters, verify in the built image, not in the repository.
+Remove a patch once the fix is in the upstream release you require.
 
 After any dependency change, regenerate and commit it:
 
