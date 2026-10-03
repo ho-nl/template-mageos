@@ -52,8 +52,7 @@
 /pub/media/captcha/*
 /pub/static/*
 !/pub/static/.htaccess
-/var/*
-!/var/.htaccess
+/var/
 /vendor/
 
 # Installed by Composer from mage-os/magento2-base on every `composer install`
