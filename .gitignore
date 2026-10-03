@@ -11,8 +11,6 @@
 
 /app/etc/env.php
 /app/etc/*.xml
-!/app/etc/di.xml
-!/app/etc/db_schema.xml
 /app/code/Magento/
 /app/design/frontend/Magento/
 /app/design/adminhtml/Magento/
@@ -30,8 +28,7 @@
 /dev/tools/grunt/-
 /dev/tests/functional/etc/config.xml
 /dev/tests/js/jasmine/spec/
-/generated/*
-!/generated/.htaccess
+/generated/
 /pub/media/*.*
 !/pub/media/.htaccess
 /pub/media/attribute/*
@@ -57,8 +54,49 @@
 !/pub/static/.htaccess
 /var/*
 !/var/.htaccess
-/vendor/*
-!/vendor/.htaccess
+/vendor/
+
+# Installed by Composer from mage-os/magento2-base on every `composer install`
+# (its extra.map) and never edited in a project, so never committed. Magento's
+# stock .gitignore assumes the old full-source checkout and leaves all of these
+# — and vendor/ and generated/, through their .htaccess exceptions — as
+# untracked files that agents and `git add -A` then commit.
+/.editorconfig
+/.htaccess
+/.htaccess.sample
+/.php-cs-fixer.dist.php
+/.user.ini
+/CHANGELOG.md
+/COPYING.txt
+/Gruntfile.js.sample
+/LICENSE.txt
+/LICENSE_AFL.txt
+/SECURITY.md
+/auth.json.sample
+/grunt-config.json.sample
+/nginx.conf.sample
+/package.json.sample
+/app/.htaccess
+/app/autoload.php
+/app/bootstrap.php
+/app/functions.php
+/app/etc/NonComposerComponentRegistration.php
+/app/etc/registration_globlist.php
+/app/etc/vendor_path.php
+/bin/
+/dev/
+/lib/
+/phpserver/
+/pub/
+/setup/
+
+# Written by the Deployyy build (the platform's Dockerfile and its .platform/
+# support files, from ho-nl/deployyy). A Dockerfile or .platform/ file committed
+# here REPLACES the platform's version for this project, so commit one only on
+# purpose.
+/.platform/
+/.platform-recipes/
+/Dockerfile
 
 # Local tooling
 /auth.json
