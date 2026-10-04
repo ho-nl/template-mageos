@@ -85,8 +85,8 @@ creation in the database.
 `composer install` (`extra.patches-search` points here). The recipe copies this
 directory into the build context *before* the install, so a patch committed here is
 in the image the platform deploys — that is how a vendor security fix ships before
-the upstream release does (first use: the StyleSmuggler DI-scanner guard,
-`patches/stylesmuggler-di-scanner-guard.patch`, Sansec 2026-09-05). Each patch
+the upstream release does (first use: the StyleSmuggler DI-scanner guard, Sansec
+2026-09-05, removed again once Mage-OS 3.5.0 shipped Adobe's official fix). Each patch
 declares its target package in its vaimo header (`@package mage-os/magento2-base`
 here — a `magento/*` target resolves to nothing on Mage-OS). Two failure modes to
 know: a patch the plugin cannot apply **fails the build**, but a patch the plugin
