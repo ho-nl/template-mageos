@@ -10,6 +10,9 @@
 #     DEPLOYYY_MAGENTO_LOCALES, which the deployyy operator converges from the
 #     Magento2App's `magento.buildLocales`. Do not edit that variable by hand.
 #
+# Secrets: COMPOSER_AUTH (the deployyy operator writes it from the project's
+# COMPOSER_AUTH variable) or the legacy MAGENTO_AUTH_JSON, passed by name below.
+#
 # Output: ghcr.io/<owner>/<repo>:php-fpm-<sha7> and :nginx-<sha7> — the exact
 # commit-keyed tags the operator verifies before it deploys. This repo's CI holds
 # ZERO cluster credentials; it only builds and pushes.
@@ -27,4 +30,10 @@ concurrency:
 jobs:
   build:
     uses: ho-nl/deployyy/.github/workflows/magento2-build.yml@main
-    secrets: inherit
+    # By name, not `secrets: inherit`: inherit only reaches a reusable workflow
+    # in this repository's own organization, and the build lives in ho-nl — a
+    # project in any other organization would build without its credentials.
+    # Either may be unset (it arrives empty; Mage-OS needs no credentials).
+    secrets:
+      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+      MAGENTO_AUTH_JSON: ${{ secrets.MAGENTO_AUTH_JSON }}
