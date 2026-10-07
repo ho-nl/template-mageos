@@ -21,10 +21,22 @@ concurrency:
 jobs:
   build:
     uses: ho-nl/deployyy/.github/workflows/magento2-build.yml@main
-    # By name, not `secrets: inherit`: inherit only reaches a reusable workflow
-    # in this repository's own organization, and the build lives in ho-nl — a
-    # project in any other organization would build without its credentials.
-    # Either may be unset (it arrives empty; Mage-OS needs no credentials).
+    # Every variable and secret, in one go, never named: this is the same in
+    # every project, and nothing here changes when you add a value. Put the
+    # values in GitHub (Settings -> Secrets and variables -> Actions, or a
+    # GitHub Environment named after the branch to override them); they reach
+    # the build and, after it, the running shop. See README "Variables and
+    # secrets".
+    #
+    # `secrets: all` and not `secrets: inherit`: inherit only reaches a
+    # reusable workflow in this repository's own organization, and the build
+    # lives in ho-nl.
+    permissions:
+      contents: read
+      packages: write   # push the images
+      actions: read     # find the GitHub Environment named after the branch
+      id-token: write   # prove to Deployyy which repository and branch this is
+    with:
+      vars: ${{ toJSON(vars) }}
     secrets:
-      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
-      MAGENTO_AUTH_JSON: ${{ secrets.MAGENTO_AUTH_JSON }}
+      all: ${{ toJSON(secrets) }}
