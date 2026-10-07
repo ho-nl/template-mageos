@@ -21,16 +21,6 @@ concurrency:
 jobs:
   build:
     uses: ho-nl/deployyy/.github/workflows/magento2-build.yml@main
-    # Every variable and secret, in one go, never named: this is the same in
-    # every project, and nothing here changes when you add a value. Put the
-    # values in GitHub (Settings -> Secrets and variables -> Actions, or a
-    # GitHub Environment named after the branch to override them); they reach
-    # the build and, after it, the running shop. See README "Variables and
-    # secrets".
-    #
-    # `secrets: all` and not `secrets: inherit`: inherit only reaches a
-    # reusable workflow in this repository's own organization, and the build
-    # lives in ho-nl.
     permissions:
       contents: read
       packages: write   # push the images
