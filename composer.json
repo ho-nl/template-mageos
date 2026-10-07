@@ -96,9 +96,7 @@
     },
     "extra": {
         "magento-force": "override",
-        "patches-search": {
-            "*": "patches"
-        }
+        "patches": {}
     },
     "prefer-stable": true,
     "minimum-stability": "stable"

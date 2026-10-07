@@ -82,17 +82,32 @@ creation in the database.
 
 **`patches/`** — vendor patches, applied by
 [`vaimo/composer-patches`](https://github.com/vaimo/composer-patches) during
-`composer install` (`extra.patches-search` points here). The recipe copies this
-directory into the build context *before* the install, so a patch committed here is
-in the image the platform deploys — that is how a vendor security fix ships before
-the upstream release does (first use: the StyleSmuggler DI-scanner guard, Sansec
-2026-09-05, removed again once Mage-OS 3.5.0 shipped Adobe's official fix). Each patch
-declares its target package in its vaimo header (`@package mage-os/magento2-base`
-here — a `magento/*` target resolves to nothing on Mage-OS). Two failure modes to
-know: a patch the plugin cannot apply **fails the build**, but a patch the plugin
-never sees (wrong directory, wrong package name) is a **silent no-op** — build green,
-unpatched image. When it matters, verify in the built image, not in the repository.
-Remove a patch once the fix is in the upstream release you require.
+`composer install`. Declare each one in `extra.patches` of composer.json, keyed by
+the package it patches:
+
+```json
+"extra": {
+    "patches": {
+        "mage-os/magento2-base": {
+            "What the patch fixes": "patches/the-fix.patch"
+        }
+    }
+}
+```
+
+The recipe copies this directory into the build context *before* the install, so a
+patch committed here is in the image the platform deploys — that is how a vendor
+security fix ships before the upstream release does (first use: the StyleSmuggler
+DI-scanner guard, Sansec 2026-09-05, removed again once Mage-OS 3.5.0 shipped Adobe's
+official fix). Target the package that is installed: on Mage-OS that is `mage-os/*`,
+never `magento/*`. A patch that does not apply fails the build, and so does a
+`*.patch` file in `patches/` that did not reach the installed code (the platform
+build checks every one after the install). Do not rely on the `extra.patches-search`
+folder scan instead: it skips a patch whose header names no installed package, and
+every patch for a branch install (`dev-main`) unless the header carries
+`@version *` — the build said "Nothing to patch", stayed green and shipped the code
+unpatched. A file kept in `patches/` that must not be applied carries `@skip` in its
+header. Remove a patch once the fix is in the upstream release you require.
 
 After any dependency change, regenerate and commit it:
 

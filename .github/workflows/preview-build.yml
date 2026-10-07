@@ -21,4 +21,10 @@ concurrency:
 jobs:
   build:
     uses: ho-nl/deployyy/.github/workflows/magento2-build.yml@main
-    secrets: inherit
+    # By name, not `secrets: inherit`: inherit only reaches a reusable workflow
+    # in this repository's own organization, and the build lives in ho-nl — a
+    # project in any other organization would build without its credentials.
+    # Either may be unset (it arrives empty; Mage-OS needs no credentials).
+    secrets:
+      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+      MAGENTO_AUTH_JSON: ${{ secrets.MAGENTO_AUTH_JSON }}
