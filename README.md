@@ -42,6 +42,35 @@ branches is the same image — which is what makes a merge deploy instantly.
 The repository's CI holds **zero cluster credentials**. It only builds and pushes;
 the operator does the deploying, the database install, the DNS and the certificates.
 
+## Variables and secrets
+
+Your shop's variables and secrets live in **GitHub, and only there** — never in
+this repository's files, and not in a separate store on the platform:
+
+- **Repository level**: *Settings → Secrets and variables → Actions*. A
+  secret for anything that must stay hidden (API keys, passwords, Composer's
+  `COMPOSER_AUTH`), a variable for what may be read back (a public address, a
+  feature flag). These apply to every branch.
+- **Per environment**: create a GitHub Environment named after the branch
+  (*Settings → Environments → New environment*, e.g. `main`) and give it its
+  own variables and secrets. For that branch they override the repository's.
+  Note that the Environment's protection rules (reviewers, wait timers) then
+  apply to that branch's build.
+
+Every one of them reaches **both the build and the running shop after the next
+build** of the branch: push, or re-run the latest build. The build masks every
+secret, gives the build steps all values as environment variables, and then
+delivers the same set to the branch's environment on Deployyy, where
+`app/etc/env.php` and `config.php` read them with `getenv()`. The Deployyy
+console lists their names per environment, read-only, with links back to
+these GitHub settings. A redeploy or rollback without a new build keeps the
+values the last build delivered.
+
+The two workflows hand everything over without naming a single value
+(`vars: ${{ toJSON(vars) }}`, `secrets: all: ${{ toJSON(secrets) }}`), so you
+never edit them when you add one. Mage-OS on public packages needs no
+`COMPOSER_AUTH`.
+
 ## What is deliberately NOT in this repository
 
 **No `Dockerfile`, no `.platform/` directory.** They come from the `mageos-3`
