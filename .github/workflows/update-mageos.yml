@@ -1,0 +1,125 @@
+# Keeps the template on the newest stable Mage-OS release.
+#
+# Weekly (and on demand) it compares the newest stable
+# mage-os/product-community-edition on repo.mage-os.org with the version in
+# composer.lock. When a newer one exists it runs Mage-OS's upgrade procedure
+# (`composer require-commerce <package> <version> --no-update`, then
+# `composer update`), regenerates app/etc/config.php, and opens a pull request
+# from the fixed branch auto/mageos-update — or updates the one already open.
+#
+# Pushes made with GITHUB_TOKEN start no workflows, so the job dispatches the
+# preview build on the branch itself: the pull request then shows whether the
+# platform can build the new release.
+#
+# Mage-OS packages are public: no Composer credentials are needed.
+# Optional secret CATALOG_TOKEN (read access to ho-nl/kubernetes-cluster) lets
+# the job confirm the platform catalog has a Magento2Release row for the line.
+#
+# Only runs in ho-nl/template-mageos itself, not in projects cloned from it.
+name: Update Mage-OS
+
+on:
+  schedule:
+    - cron: '17 5 * * 1'   # Mondays 05:17 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write        # push auto/mageos-update
+  pull-requests: write   # open or update the pull request
+  actions: write         # dispatch the preview build on that branch
+
+concurrency:
+  group: update-mageos
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.repository == 'ho-nl/template-mageos'
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: auto/mageos-update
+      PACKAGE: mage-os/product-community-edition
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Compare the locked version with the newest release
+        id: v
+        run: python3 .github/scripts/mageos-release.py versions
+
+      - name: Nothing to do
+        if: steps.v.outputs.newer != 'true'
+        run: echo "composer.lock is on ${{ steps.v.outputs.current }}, the newest stable release." >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: shivammathur/setup-php@v2
+        if: steps.v.outputs.newer == 'true'
+        with:
+          php-version: '8.4'
+          extensions: bcmath, ctype, curl, dom, gd, hash, iconv, intl, mbstring, openssl, pdo_mysql, simplexml, soap, sodium, sockets, xsl, zip
+          tools: composer:v2
+          coverage: none
+
+      - name: Upgrade
+        if: steps.v.outputs.newer == 'true'
+        env:
+          OLD: ${{ steps.v.outputs.current }}
+          NEW: ${{ steps.v.outputs.latest }}
+        run: |
+          set -euo pipefail
+          git checkout -B "$BRANCH"
+          # The root-update plugin must be installed for require-commerce.
+          composer install --no-dev --no-interaction --no-progress
+          composer require-commerce "$PACKAGE" "$NEW" --no-update --no-interaction
+          # Sample data and the other mage-os/* packages pinned at the old release.
+          python3 .github/scripts/mageos-release.py pin "$OLD" "$NEW"
+          composer update --no-install --no-interaction --no-progress
+          # The module list of what the platform builds (--no-dev), see README.
+          composer install --no-dev --no-interaction --no-progress
+          php bin/magento module:enable --all
+          sed -i "s/Mage-OS $OLD/Mage-OS $NEW/g" README.md
+          git status --short
+
+      - name: Platform support
+        if: steps.v.outputs.newer == 'true'
+        env:
+          CATALOG_TOKEN: ${{ secrets.CATALOG_TOKEN }}
+        run: |
+          python3 .github/scripts/mageos-release.py support \
+            "${{ steps.v.outputs.current }}" "${{ steps.v.outputs.latest }}" > "$RUNNER_TEMP/support.md"
+          cat "$RUNNER_TEMP/support.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Push and open or update the pull request
+        if: steps.v.outputs.newer == 'true'
+        env:
+          OLD: ${{ steps.v.outputs.current }}
+          NEW: ${{ steps.v.outputs.latest }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add composer.json composer.lock app/etc/config.php README.md
+          git commit -m "Mage-OS $NEW"
+          git push --force origin "$BRANCH"
+
+          title="Mage-OS $NEW"
+          {
+            echo "Updates Mage-OS from **$OLD** to **$NEW** (\`composer require-commerce $PACKAGE $NEW\`, then \`composer update\`), and regenerates \`app/etc/config.php\`."
+            echo
+            echo "Changelog: https://github.com/mage-os/mageos-magento2/releases/tag/$NEW"
+            echo
+            cat "$RUNNER_TEMP/support.md"
+            echo
+            echo "Opened by \`.github/workflows/update-mageos.yml\` ([run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID))."
+          } > "$RUNNER_TEMP/body.md"
+
+          pr=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh pr create --head "$BRANCH" --base "${{ github.event.repository.default_branch }}" \
+              --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          fi
+
+          gh workflow run preview-build.yml --ref "$BRANCH"
