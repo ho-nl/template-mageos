@@ -13,6 +13,9 @@ name: Preview build
 on:
   push:
     branches-ignore: [main]
+  # Dispatched by update-mageos.yml on auto/mageos-update: its pushes are made
+  # with GITHUB_TOKEN and start no workflows by themselves.
+  workflow_dispatch: {}
 
 concurrency:
   group: preview-build-${{ github.ref_name }}
