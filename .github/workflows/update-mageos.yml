@@ -7,13 +7,9 @@
 # `composer update`), regenerates app/etc/config.php, and opens a pull request
 # from the fixed branch auto/mageos-update — or updates the one already open.
 #
-# Pushes made with GITHUB_TOKEN start no workflows, so the job dispatches the
-# preview build on the branch itself: the pull request then shows whether the
-# platform can build the new release.
+# Deployyy builds the branch in its preview environment.
 #
 # Mage-OS packages are public: no Composer credentials are needed.
-# Optional secret CATALOG_TOKEN (read access to ho-nl/kubernetes-cluster) lets
-# the job confirm the platform catalog has a Magento2Release row for the line.
 #
 # Only runs in ho-nl/template-mageos itself, not in projects cloned from it.
 name: Update Mage-OS
@@ -26,7 +22,6 @@ on:
 permissions:
   contents: write        # push auto/mageos-update
   pull-requests: write   # open or update the pull request
-  actions: write         # dispatch the preview build on that branch
 
 concurrency:
   group: update-mageos
@@ -83,8 +78,6 @@ jobs:
 
       - name: Platform support
         if: steps.v.outputs.newer == 'true'
-        env:
-          CATALOG_TOKEN: ${{ secrets.CATALOG_TOKEN }}
         run: |
           python3 .github/scripts/mageos-release.py support \
             "${{ steps.v.outputs.current }}" "${{ steps.v.outputs.latest }}" > "$RUNNER_TEMP/support.md"
@@ -122,4 +115,3 @@ jobs:
               --title "$title" --body-file "$RUNNER_TEMP/body.md"
           fi
 
-          gh workflow run preview-build.yml --ref "$BRANCH"

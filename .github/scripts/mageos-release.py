@@ -15,8 +15,6 @@ import urllib.request
 
 PACKAGE = "mage-os/product-community-edition"
 REPO = "https://repo.mage-os.org"
-BUILD_WORKFLOW = "https://raw.githubusercontent.com/ho-nl/deployyy/main/.github/workflows/magento2-build.yml"
-CATALOG = "https://api.github.com/repos/ho-nl/kubernetes-cluster/contents/platform/deployyy/catalog/magento2-releases.yaml"
 
 
 def key(version):
@@ -66,43 +64,19 @@ def pin(old, new):
 
 
 def support(old, new):
-    """The operator derives the line `mageos-<major>` from composer.json; the
-    catalog row for that line inherits one Magento core. A new release is
-    deployable when its line has a catalog row, the central build knows the
-    line, and the release is still on the core the line was validated on."""
+    """A release on another Magento core needs a line row for that core in the
+    platform's magento recipe. The preview environment of the branch runs the
+    compatibility check."""
     rel = releases()
-    major = new.split(".")[0]
-    line = f"mageos-{major}"
     core_old = rel.get(old, {}).get("extra", {}).get("magento_version", "?")
     core_new = rel.get(new, {}).get("extra", {}).get("magento_version", "?")
     problems, facts = [], []
 
     if core_new != core_old:
         problems.append(f"Magento core changes from {core_old} to **{core_new}**. "
-                        f"The `{line}` catalog row was validated on {core_old}; "
-                        "a core change needs a validated row first.")
+                        "The magento recipe needs a line row for that core.")
     else:
         facts.append(f"Magento core stays {core_new}.")
-
-    build = fetch(BUILD_WORKFLOW)
-    if re.search(rf'"{re.escape(PACKAGE)}",\s*"{major}\.",\s*"{line}"', build):
-        facts.append(f"The central build (ho-nl/deployyy `magento2-build.yml`) knows line `{line}`.")
-    else:
-        problems.append(f"The central build (ho-nl/deployyy `magento2-build.yml`) has no line `{line}`.")
-
-    token = os.environ.get("CATALOG_TOKEN")
-    if token:
-        try:
-            catalog = fetch(CATALOG, {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github.raw"})
-            if re.search(rf"^\s*name:\s*{re.escape(line)}\s*$", catalog, re.M):
-                facts.append(f"The platform catalog has a Magento2Release row `{line}`.")
-            else:
-                problems.append(f"The platform catalog (ho-nl/kubernetes-cluster) has **no Magento2Release row `{line}`**.")
-        except Exception as e:  # noqa: BLE001 — an unreadable catalog is reported, never assumed fine
-            problems.append(f"Could not read the platform catalog ({e}); check the `{line}` row by hand.")
-    else:
-        problems.append(f"The platform catalog (ho-nl/kubernetes-cluster) was not read: the repository has no "
-                        f"`CATALOG_TOKEN` secret. Check that a Magento2Release row `{line}` exists before merging.")
 
     lines = ["### Platform support", ""]
     if problems:
