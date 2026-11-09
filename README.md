@@ -5,7 +5,7 @@ The **Mage-OS** template of the Deployyy platform: what
 `composer create-project mage-os/project-community-edition` with the Mage-OS sample
 data, so a fresh environment installs a stocked Luma store.
 
-**Version: Mage-OS 3.6.0** (Magento core 2.4.9, PHP 8.4, platform line `mageos-3`).
+**Version: Mage-OS 4.0.0** (Magento core 2.4.9, PHP 8.4, platform line `mageos-3`).
 Packages come from `https://repo.mage-os.org/`; no Adobe Marketplace keys needed.
 
 ## What is in the repository, and why
